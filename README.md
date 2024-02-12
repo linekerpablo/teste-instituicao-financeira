@@ -24,6 +24,7 @@ O projeto segue a seguinte estrutura de pacotes, alinhada com os princípios da 
 - **`infra`**
     - **`repositories`**: Implementações concretas dos repositórios, baseadas em frameworks de persistência.
     - **`gateways`**: Implementações concretas dos gateways definidos na camada de domínio.
+    - **`h2`**: Banco H2 foi utilizado afim de facilitar a criação do projeto teste.
 - **`presentation`**
     - **`restcontrollers`**: Controladores REST que expõem as funcionalidades da API.
 
