@@ -1,6 +1,6 @@
 package com.teste.financeira.srm.presentation.exceptions;
 
-import com.teste.financeira.srm.domain.exceptions.CustomException;
+import com.teste.financeira.srm.domain.exceptions.DomainException;
 import com.teste.financeira.srm.presentation.models.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex, WebRequest request) {
+    @ExceptionHandler(DomainException.class)
+    public ResponseEntity<ErrorResponse> handleCustomException(DomainException ex, WebRequest request) {
         var errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())

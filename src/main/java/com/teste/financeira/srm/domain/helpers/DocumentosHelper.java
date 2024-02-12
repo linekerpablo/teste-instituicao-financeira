@@ -1,6 +1,6 @@
 package com.teste.financeira.srm.domain.helpers;
 
-import com.teste.financeira.srm.domain.exceptions.CustomException;
+import com.teste.financeira.srm.domain.exceptions.DomainException;
 
 public class DocumentosHelper {
     public static boolean isCPFValido(String cpf) {
@@ -66,7 +66,7 @@ public class DocumentosHelper {
 
     public static boolean isEstudante(String identificador) {
         if (identificador.length() != 8) {
-            throw new CustomException("Identificador de estudante universitário inválido.");
+            throw new DomainException("Identificador de estudante universitário inválido.");
         }
 
         int primeiroDigito = Character.getNumericValue(identificador.charAt(0));
@@ -77,7 +77,7 @@ public class DocumentosHelper {
 
     public static boolean isAposentado(String identificador) {
         if (identificador.length() != 10) {
-            throw new CustomException("Identificador de aposentado inválido.");
+            throw new DomainException("Identificador de aposentado inválido.");
         }
 
         char ultimoDigito = identificador.charAt(identificador.length() - 1);

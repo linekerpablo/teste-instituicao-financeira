@@ -2,10 +2,10 @@ package com.teste.financeira.srm.domain.usecases.pessoa;
 
 import com.teste.financeira.srm.domain.entities.Pessoa;
 import com.teste.financeira.srm.domain.enums.TipoIdentificador;
-import com.teste.financeira.srm.domain.exceptions.CustomException;
+import com.teste.financeira.srm.domain.exceptions.DomainException;
+import com.teste.financeira.srm.domain.gateways.PessoaGateway;
 import com.teste.financeira.srm.domain.helpers.DocumentosHelper;
 import com.teste.financeira.srm.domain.usecases.pessoa.interfaces.CadastrarPessoaUseCase;
-import com.teste.financeira.srm.infra.repositories.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 public class CadastrarPessoaUseCaseImpl implements CadastrarPessoaUseCase {
 
     @Autowired
-    private PessoaRepository pessoaRepository;
+    private PessoaGateway pessoaGateway;
 
-    public Pessoa executar(Pessoa pessoa) throws CustomException {
+    public Pessoa executar(Pessoa pessoa) throws DomainException {
         definirTipoIdentificadorEValores(pessoa);
         validarPessoa(pessoa);
-        return pessoaRepository.save(pessoa);
+        return pessoaGateway.save(pessoa);
     }
 
     private void definirTipoIdentificadorEValores(Pessoa pessoa) {
@@ -47,38 +47,38 @@ public class CadastrarPessoaUseCaseImpl implements CadastrarPessoaUseCase {
                 pessoa.setValorMaximoEmprestimo(25000.00);
                 break;
             default:
-                throw new CustomException("Identificador inválido.");
+                throw new DomainException("Identificador inválido.");
         }
     }
 
     private void validarPessoa(Pessoa pessoa) {
-        if (pessoaRepository.existsByIdentificador(pessoa.getIdentificador())) {
-            throw new CustomException("Identificador já existe.");
+        if (pessoaGateway.existsByIdentificador(pessoa.getIdentificador())) {
+            throw new DomainException("Identificador já existe.");
         }
 
         switch (pessoa.getTipoIdentificador()) {
             case PF:
                 if (!DocumentosHelper.isCPFValido(pessoa.getIdentificador())) {
-                    throw new CustomException("CPF inválido.");
+                    throw new DomainException("CPF inválido.");
                 }
                 break;
             case PJ:
                 if (!DocumentosHelper.isCNPJValido(pessoa.getIdentificador())) {
-                    throw new CustomException("CNPJ inválido.");
+                    throw new DomainException("CNPJ inválido.");
                 }
                 break;
             case EU:
                 if (!DocumentosHelper.isEstudante(pessoa.getIdentificador())) {
-                    throw new CustomException("CNPJ inválido.");
+                    throw new DomainException("CNPJ inválido.");
                 }
                 break;
             case AP:
                 if (!DocumentosHelper.isAposentado(pessoa.getIdentificador())) {
-                    throw new CustomException("CNPJ inválido.");
+                    throw new DomainException("CNPJ inválido.");
                 }
                 break;
             default:
-                throw new CustomException("Tipo de identificador desconhecido.");
+                throw new DomainException("Tipo de identificador desconhecido.");
         }
     }
 }
