@@ -1,54 +1,37 @@
 package com.teste.financeira.srm.domain.services;
 
 import com.teste.financeira.srm.domain.entities.Pessoa;
+import com.teste.financeira.srm.domain.enums.TipoIdentificador;
 import com.teste.financeira.srm.domain.exceptions.DomainException;
-import com.teste.financeira.srm.domain.helpers.DocumentosHelper;
 import com.teste.financeira.srm.domain.services.interfaces.ValidacaoPessoaService;
+import com.teste.financeira.srm.domain.validation.ValidadorAposentado;
+import com.teste.financeira.srm.domain.validation.ValidadorCNPJ;
+import com.teste.financeira.srm.domain.validation.ValidadorCPF;
+import com.teste.financeira.srm.domain.validation.ValidadorEstudanteUniversitario;
+import com.teste.financeira.srm.domain.validation.interfaces.ValidadorIdentificador;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ValidacaoPessoaServiceImpl implements ValidacaoPessoaService {
 
+    private final Map<TipoIdentificador, ValidadorIdentificador> estrategias;
+
+    public ValidacaoPessoaServiceImpl() {
+        estrategias = new HashMap<>();
+        estrategias.put(TipoIdentificador.PESSOA_FISICA, new ValidadorCPF());
+        estrategias.put(TipoIdentificador.PESSOA_JURIDICA, new ValidadorCNPJ());
+        estrategias.put(TipoIdentificador.ESTUDANTE_UNIVERSITARIO, new ValidadorEstudanteUniversitario());
+        estrategias.put(TipoIdentificador.APOSENTADO, new ValidadorAposentado());
+    }
+
+    @Override
     public void validarIdentificador(Pessoa pessoa) {
-        switch (pessoa.getTipoIdentificador()) {
-            case PESSOA_FISICA:
-                validarCPF(pessoa.getIdentificador());
-                break;
-            case PESSOA_JURIDICA:
-                validarCNPJ(pessoa.getIdentificador());
-                break;
-            case ESTUDANTE_UNIVERSITARIO:
-                validarEstudante(pessoa.getIdentificador());
-                break;
-            case APOSENTADO:
-                validarAposentado(pessoa.getIdentificador());
-                break;
-            default:
-                throw new DomainException("Tipo de identificador desconhecido.");
-        }
-    }
-
-    private void validarCPF(String cpf) {
-        if (!DocumentosHelper.isCPFValido(cpf)) {
-            throw new DomainException("CPF inválido.");
-        }
-    }
-
-    private void validarCNPJ(String cnpj) {
-        if (!DocumentosHelper.isCNPJValido(cnpj)) {
-            throw new DomainException("CNPJ inválido.");
-        }
-    }
-
-    private void validarEstudante(String identificador) {
-        if (!DocumentosHelper.isEstudante(identificador)) {
-            throw new DomainException("Identificador de estudante inválido.");
-        }
-    }
-
-    private void validarAposentado(String identificador) {
-        if (!DocumentosHelper.isAposentado(identificador)) {
-            throw new DomainException("Identificador de aposentado inválido.");
-        }
+        Optional.ofNullable(estrategias.get(pessoa.getTipoIdentificador()))
+                .orElseThrow(() -> new DomainException("Tipo de identificador desconhecido."))
+                .validar(pessoa.getIdentificador());
     }
 }

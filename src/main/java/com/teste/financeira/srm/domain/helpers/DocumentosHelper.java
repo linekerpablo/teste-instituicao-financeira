@@ -38,30 +38,45 @@ public class DocumentosHelper {
     }
 
     public static boolean isCNPJValido(String cnpj) {
-        cnpj = cnpj.replaceAll("[^0-9]", ""); // Remove caracteres não numéricos
+        if (cnpj == null || cnpj.length() != 14 || cnpj.matches(cnpj.charAt(0) + "{14}")) return false;
 
-        if (cnpj.length() != 14 || todosDigitosIguais(cnpj)) return false;
-
-        String base = cnpj.substring(0, 12);
-        String digitos = cnpj.substring(12);
-
-        String dv1 = calcularDVCNPJ(base);
-        String dv2 = calcularDVCNPJ(base + dv1);
-
-        return digitos.equals(dv1 + dv2);
-    }
-
-    private static String calcularDVCNPJ(String base) {
-        int[] pesos = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
-        int soma = 0;
-        int indicePeso = base.length();
-
-        for (char c : base.toCharArray()) {
-            soma += (c - '0') * pesos[pesos.length - 1 - indicePeso--];
+        try {
+            Long.parseLong(cnpj);
+        } catch (NumberFormatException e) {
+            return false;
         }
 
-        int resto = soma % 11;
-        return (resto < 2) ? "0" : Integer.toString(11 - resto);
+        int soma = 0;
+        String cnpjCalc = cnpj.substring(0, 12);
+        char[] charCnpj = cnpj.toCharArray();
+        for (int i = 0; i < 4; i++) {
+            if (charCnpj[i] - 48 >= 0 && charCnpj[i] - 48 <= 9) {
+                soma += (charCnpj[i] - 48) * (6 - (i + 1));
+            }
+        }
+        for (int i = 0; i < 8; i++) {
+            if (charCnpj[i + 4] - 48 >= 0 && charCnpj[i + 4] - 48 <= 9) {
+                soma += (charCnpj[i + 4] - 48) * (10 - (i + 1));
+            }
+        }
+        int dig = 11 - (soma % 11);
+        cnpjCalc += (dig == 10 || dig == 11) ? "0" : Integer.toString(dig);
+
+        soma = 0;
+        for (int i = 0; i < 5; i++) {
+            if (charCnpj[i] - 48 >= 0 && charCnpj[i] - 48 <= 9) {
+                soma += (charCnpj[i] - 48) * (7 - (i + 1));
+            }
+        }
+        for (int i = 0; i < 8; i++) {
+            if (charCnpj[i + 5] - 48 >= 0 && charCnpj[i + 5] - 48 <= 9) {
+                soma += (charCnpj[i + 5] - 48) * (10 - (i + 1));
+            }
+        }
+        dig = 11 - (soma % 11);
+        cnpjCalc += (dig == 10 || dig == 11) ? "0" : Integer.toString(dig);
+
+        return cnpj.equals(cnpjCalc);
     }
 
     public static boolean isEstudante(String identificador) {
@@ -81,14 +96,13 @@ public class DocumentosHelper {
         }
 
         char ultimoDigito = identificador.charAt(identificador.length() - 1);
-        boolean result = true;
 
         for (int i = 0; i < identificador.length() - 1; i++) {
             if (identificador.charAt(i) == ultimoDigito) {
-                result = identificador.charAt(i) == ultimoDigito;
+                return false;
             }
         }
 
-        return result;
+        return true;
     }
 }
