@@ -5,6 +5,7 @@ import com.teste.financeira.srm.domain.entities.Pessoa;
 import com.teste.financeira.srm.domain.exceptions.CustomException;
 import com.teste.financeira.srm.domain.helpers.DocumentosHelper;
 import com.teste.financeira.srm.domain.usecases.emprestimo.interfaces.RealizarEmprestimoUseCase;
+import com.teste.financeira.srm.infra.messaging.interfaces.EnviarEmprestimoFilaPagamento;
 import com.teste.financeira.srm.infra.repositories.EmprestimoRepository;
 import com.teste.financeira.srm.infra.repositories.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class RealizarEmprestimoUseCaseImpl implements RealizarEmprestimoUseCase 
     @Autowired
     private PessoaRepository pessoaRepository;
 
+    @Autowired
+    private EnviarEmprestimoFilaPagamento enviarEmprestimoFilaPagamento;
+
     public Emprestimo executar(Emprestimo emprestimo, String identificadorPessoa) {
         Pessoa pessoa = pessoaRepository.findByIdentificador(identificadorPessoa)
                 .orElseThrow(() -> new CustomException("Identificador inválido ou não encontrado."));
@@ -27,7 +31,10 @@ public class RealizarEmprestimoUseCaseImpl implements RealizarEmprestimoUseCase 
 
         emprestimo.setPessoa(pessoa);
 
-        return emprestimoRepository.save(emprestimo);
+        emprestimoRepository.save(emprestimo);
+        enviarEmprestimoFilaPagamento.executar(emprestimo.getId());
+
+        return emprestimo;
     }
 
     private void validarIdentificador(Pessoa pessoa) {
