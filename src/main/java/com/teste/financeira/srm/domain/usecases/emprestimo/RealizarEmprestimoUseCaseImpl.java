@@ -11,6 +11,8 @@ import com.teste.financeira.srm.infra.repositories.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class RealizarEmprestimoUseCaseImpl implements RealizarEmprestimoUseCase {
     @Autowired
@@ -30,6 +32,7 @@ public class RealizarEmprestimoUseCaseImpl implements RealizarEmprestimoUseCase 
         validarEmprestimo(emprestimo, pessoa);
 
         emprestimo.setPessoa(pessoa);
+        emprestimo.setDataCriacao(new Date());
 
         emprestimoRepository.save(emprestimo);
         enviarEmprestimoFilaPagamento.executar(emprestimo.getId());

@@ -1,6 +1,7 @@
 package com.teste.financeira.srm.presentation.restcontrollers;
 
 import com.teste.financeira.srm.domain.entities.Emprestimo;
+import com.teste.financeira.srm.domain.usecases.emprestimo.interfaces.AtualizarStatusEmprestimoUseCase;
 import com.teste.financeira.srm.domain.usecases.emprestimo.interfaces.RealizarEmprestimoUseCase;
 import com.teste.financeira.srm.presentation.models.request.EmprestimoModelRequest;
 import com.teste.financeira.srm.presentation.models.response.EmprestimoModelResponse;
@@ -17,11 +18,21 @@ public class EmprestimoRestController {
     @Autowired
     private RealizarEmprestimoUseCase realizarEmprestimoUseCase;
 
+    @Autowired
+    private AtualizarStatusEmprestimoUseCase atualizarStatusEmprestimoUseCase;
+
     @PostMapping
-    public ResponseEntity<EmprestimoModelResponse> realizarEmprestimo(@RequestBody EmprestimoModelRequest modelRequest) {
+    public ResponseEntity<EmprestimoModelResponse> criar(@RequestBody EmprestimoModelRequest modelRequest) {
         Emprestimo emprestimo = EmprestimoRequestToEmprestimoTranslator.translate(modelRequest);
         Emprestimo novoEmprestimo = realizarEmprestimoUseCase.executar(emprestimo, modelRequest.getIdentificadorPessoa());
         EmprestimoModelResponse response = EmprestimoToEmprestimoResponseTranslator.translate(novoEmprestimo);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{emprestimoId}/quitar")
+    public ResponseEntity<EmprestimoModelResponse> quitar(@PathVariable Long emprestimoId) {
+        atualizarStatusEmprestimoUseCase.executar(emprestimoId, "Pago");
+
+        return ResponseEntity.ok().build();
     }
 }

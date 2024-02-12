@@ -22,7 +22,7 @@ public class Emprestimo {
     private String statusPagamento;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date dataCriacao = new Date();
+    private Date dataCriacao;
 
     @ManyToOne
     @JoinColumn(name = "pessoa_id")
