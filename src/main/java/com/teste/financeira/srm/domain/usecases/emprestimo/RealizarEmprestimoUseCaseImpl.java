@@ -6,6 +6,7 @@ import com.teste.financeira.srm.domain.exceptions.DomainException;
 import com.teste.financeira.srm.domain.gateways.EmprestimoGateway;
 import com.teste.financeira.srm.domain.gateways.PessoaGateway;
 import com.teste.financeira.srm.domain.helpers.DocumentosHelper;
+import com.teste.financeira.srm.domain.services.interfaces.ValidacaoPessoaService;
 import com.teste.financeira.srm.domain.usecases.emprestimo.interfaces.RealizarEmprestimoUseCase;
 import com.teste.financeira.srm.infra.messaging.interfaces.EnviarEmprestimoFilaPagamento;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +24,15 @@ public class RealizarEmprestimoUseCaseImpl implements RealizarEmprestimoUseCase 
     private PessoaGateway pessoaGateway;
 
     @Autowired
+    private ValidacaoPessoaService validacaoPessoaService;
+
+    @Autowired
     private EnviarEmprestimoFilaPagamento enviarEmprestimoFilaPagamento;
 
     public Emprestimo executar(Emprestimo emprestimo, String identificadorPessoa) {
         Pessoa pessoa = pessoaGateway.findByIdentificador(identificadorPessoa);
 
-        validarIdentificador(pessoa);
+        validacaoPessoaService.validarIdentificador(pessoa);
         validarEmprestimo(emprestimo, pessoa);
 
         emprestimo.setPessoa(pessoa);
@@ -38,33 +42,6 @@ public class RealizarEmprestimoUseCaseImpl implements RealizarEmprestimoUseCase 
         enviarEmprestimoFilaPagamento.executar(emprestimo.getId());
 
         return emprestimo;
-    }
-
-    private void validarIdentificador(Pessoa pessoa) {
-        switch (pessoa.getTipoIdentificador()) {
-            case PF:
-                if (!DocumentosHelper.isCPFValido(pessoa.getIdentificador())) {
-                    throw new DomainException("CPF inválido.");
-                }
-                break;
-            case PJ:
-                if (!DocumentosHelper.isCNPJValido(pessoa.getIdentificador())) {
-                    throw new DomainException("CNPJ inválido.");
-                }
-                break;
-            case EU:
-                if (!DocumentosHelper.isEstudante(pessoa.getIdentificador())) {
-                    throw new DomainException("CNPJ inválido.");
-                }
-                break;
-            case AP:
-                if (!DocumentosHelper.isAposentado(pessoa.getIdentificador())) {
-                    throw new DomainException("CNPJ inválido.");
-                }
-                break;
-            default:
-                throw new DomainException("Tipo de identificador desconhecido.");
-        }
     }
 
     private void validarEmprestimo(Emprestimo emprestimo, Pessoa pessoa) {

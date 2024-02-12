@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "2cecfe6b-a105-4401-b6de-07cadef04044",
+		"name": "Teste SRM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1495178"
+	},
+	"item": [
+		{
+			"name": "Pessoa",
+			"item": [
+				{
+					"name": "Criar Pessoa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody)\r",
+									"pm.environment.set(\"identificadorPessoa\", jsonData.identificador);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"Rifka Carvalho\",\r\n    \"identificador\": \"38414425879\",\r\n    \"dataNascimento\": \"1990-09-13\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/pessoas",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"pessoas"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Emprestimo",
+			"item": [
+				{
+					"name": "Criar Empréstimo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"valorEmprestimo\": 1000,\r\n    \"numeroParcelas\": 1,\r\n    \"identificadorPessoa\": \"{{identificadorPessoa}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/emprestimos",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"emprestimos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

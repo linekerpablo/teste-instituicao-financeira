@@ -38,6 +38,7 @@ Para executar o projeto, siga os passos abaixo:
    cd teste-instituicao-financeira
 3. Execute o projeto utilizando o Maven:
    ./mvnw spring-boot:run
+4. Para consumir as apis localmente, faça a importação das variáveis de ambiente e das collections na pasta collections do projeto
 
 ## Enviando Empréstimos para a Fila de Processamento
 
