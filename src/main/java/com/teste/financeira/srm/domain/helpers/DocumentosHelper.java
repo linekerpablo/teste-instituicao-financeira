@@ -1,5 +1,7 @@
 package com.teste.financeira.srm.domain.helpers;
 
+import com.teste.financeira.srm.domain.exceptions.CustomException;
+
 public class DocumentosHelper {
     public static boolean isCPFValido(String cpf) {
         cpf = cpf.replaceAll("[^0-9]", ""); // Remove caracteres não numéricos
@@ -60,5 +62,33 @@ public class DocumentosHelper {
 
         int resto = soma % 11;
         return (resto < 2) ? "0" : Integer.toString(11 - resto);
+    }
+
+    public static boolean isEstudante(String identificador) {
+        if (identificador.length() != 8) {
+            throw new CustomException("Identificador de estudante universitário inválido.");
+        }
+
+        int primeiroDigito = Character.getNumericValue(identificador.charAt(0));
+        int ultimoDigito = Character.getNumericValue(identificador.charAt(identificador.length() - 1));
+
+        return primeiroDigito + ultimoDigito == 9;
+    }
+
+    public static boolean isAposentado(String identificador) {
+        if (identificador.length() != 10) {
+            throw new CustomException("Identificador de aposentado inválido.");
+        }
+
+        char ultimoDigito = identificador.charAt(identificador.length() - 1);
+        boolean result = true;
+
+        for (int i = 0; i < identificador.length() - 1; i++) {
+            if (identificador.charAt(i) == ultimoDigito) {
+                result = identificador.charAt(i) == ultimoDigito;
+            }
+        }
+
+        return result;
     }
 }

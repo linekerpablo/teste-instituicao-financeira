@@ -4,24 +4,21 @@ import com.teste.financeira.srm.domain.entities.Pessoa;
 import com.teste.financeira.srm.domain.enums.TipoIdentificador;
 import com.teste.financeira.srm.domain.exceptions.CustomException;
 import com.teste.financeira.srm.domain.helpers.DocumentosHelper;
+import com.teste.financeira.srm.domain.usecases.pessoa.interfaces.CadastrarPessoaUseCase;
 import com.teste.financeira.srm.infra.repositories.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CadastrarPessoaUseCase {
+public class CadastrarPessoaUseCaseImpl implements CadastrarPessoaUseCase {
 
     @Autowired
     private PessoaRepository pessoaRepository;
 
-    public Pessoa executar(Pessoa pessoa) {
-        try {
-            definirTipoIdentificadorEValores(pessoa);
-            validarPessoa(pessoa);
-            return pessoaRepository.save(pessoa);
-        } catch (Exception ex) {
-            throw new CustomException("Erro ao cadastrar pessoa");
-        }
+    public Pessoa executar(Pessoa pessoa) throws CustomException {
+        definirTipoIdentificadorEValores(pessoa);
+        validarPessoa(pessoa);
+        return pessoaRepository.save(pessoa);
     }
 
     private void definirTipoIdentificadorEValores(Pessoa pessoa) {
@@ -67,6 +64,16 @@ public class CadastrarPessoaUseCase {
                 break;
             case PJ:
                 if (!DocumentosHelper.isCNPJValido(pessoa.getIdentificador())) {
+                    throw new CustomException("CNPJ inválido.");
+                }
+                break;
+            case EU:
+                if (!DocumentosHelper.isEstudante(pessoa.getIdentificador())) {
+                    throw new CustomException("CNPJ inválido.");
+                }
+                break;
+            case AP:
+                if (!DocumentosHelper.isAposentado(pessoa.getIdentificador())) {
                     throw new CustomException("CNPJ inválido.");
                 }
                 break;

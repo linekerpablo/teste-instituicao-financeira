@@ -1,10 +1,10 @@
 package com.teste.financeira.srm.presentation.restcontrollers;
 
 import com.teste.financeira.srm.domain.entities.Pessoa;
+import com.teste.financeira.srm.domain.usecases.pessoa.interfaces.CadastrarPessoaUseCase;
 import com.teste.financeira.srm.presentation.models.request.PessoaModelRequest;
 import com.teste.financeira.srm.presentation.models.response.PessoaModelResponse;
 import com.teste.financeira.srm.presentation.translators.request.PessoaModelRequestToPessoaTranslator;
-import com.teste.financeira.srm.domain.usecases.pessoa.CadastrarPessoaUseCase;
 import com.teste.financeira.srm.presentation.translators.response.PessoaToPessoaModelResponseTranslator;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
